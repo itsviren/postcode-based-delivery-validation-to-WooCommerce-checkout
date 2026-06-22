@@ -91,10 +91,18 @@ public function ajax_validate_postcode()
         $postcode
     );
 
+  
+    $is_valid = WC_DPV_Validator::is_valid($postcode);
+
+    $message = $is_valid
+        ? __('Delivery available', 'wc-dpv')
+        : __('Delivery is not available for this postcode', 'wc-dpv');
+
     wp_send_json_success([
-        'valid' => $is_valid,
+        'valid'   => $is_valid,
+        'message' => $message,
     ]);
-}
+    }
 public function add_delivery_postcode_field($fields)
 {
     // Remove default WooCommerce postcode field
@@ -127,10 +135,10 @@ public function validate_delivery_postcode()
 
     if (!WC_DPV_Validator::is_valid($postcode)) {
 
-        wc_add_notice(
-            __('Please enter a valid 6-digit delivery postcode.', 'wc-dpv'),
-            'error'
-        );
+    wc_add_notice(
+        __('Delivery is not available for this postcode.', 'wc-dpv'),
+        'error'
+    );
     }
 }
 

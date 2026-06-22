@@ -14,9 +14,9 @@ class WC_DPV_Plugin
 
     private function init_classes()
     {
-       
         new WC_DPV_Checkout();
         new WC_DPV_Order();
         new WC_DPV_Session();
+        new WC_DPV_Settings();
     }
 }

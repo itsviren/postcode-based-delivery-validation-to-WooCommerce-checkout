@@ -21,6 +21,8 @@ class WC_DPV_Loader
         require_once WC_DPV_PLUGIN_PATH . 'includes/class-validator.php';
         require_once WC_DPV_PLUGIN_PATH . 'includes/class-order.php';
         require_once WC_DPV_PLUGIN_PATH . 'includes/class-session.php';
+
+        require_once WC_DPV_PLUGIN_PATH . 'admin/class-settings.php';
         
     }
 
