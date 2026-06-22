@@ -83,26 +83,34 @@ public function ajax_validate_postcode()
         'nonce'
     );
 
+
     $postcode = sanitize_text_field(
         wp_unslash($_POST['postcode'] ?? '')
     );
+error_log('AJAX POSTCODE: ' . $postcode);
+    // Check format first
+    if (!preg_match('/^[1-9][0-9]{5}$/', $postcode)) {
+error_log('FORMAT ERROR');
+        wp_send_json_success([
+            'valid'   => false,
+            'message' => __('Please enter a valid 6-digit postcode.', 'wc-dpv'),
+        ]);
+    }
 
-    $is_valid = WC_DPV_Validator::is_valid(
-        $postcode
-    );
-
-  
-    $is_valid = WC_DPV_Validator::is_valid($postcode);
-
-    $message = $is_valid
-        ? __('Delivery available', 'wc-dpv')
-        : __('Delivery is not available for this postcode', 'wc-dpv');
+    // Check blocked postcode
+    if (!WC_DPV_Validator::is_valid($postcode)) {
+error_log('BLOCKED POSTCODE');
+        wp_send_json_success([
+            'valid'   => false,
+            'message' => __('Delivery is not available for this postcode.', 'wc-dpv'),
+        ]);
+    }
 
     wp_send_json_success([
-        'valid'   => $is_valid,
-        'message' => $message,
+        'valid'   => true,
+        'message' => __('Delivery available.', 'wc-dpv'),
     ]);
-    }
+}
 public function add_delivery_postcode_field($fields)
 {
     // Remove default WooCommerce postcode field
@@ -120,7 +128,6 @@ public function add_delivery_postcode_field($fields)
 
     return $fields;
 }
-
 public function validate_delivery_postcode()
 {
     if (
@@ -133,14 +140,25 @@ public function validate_delivery_postcode()
         wp_unslash($_POST['billing_delivery_postcode'])
     );
 
+    // Check postcode format
+    if (!preg_match('/^[1-9][0-9]{5}$/', $postcode)) {
+
+        wc_add_notice(
+            __('Please enter a valid 6-digit postcode.', 'wc-dpv'),
+            'error'
+        );
+
+        return;
+    }
+
+    // Check blocked/delivery availability
     if (!WC_DPV_Validator::is_valid($postcode)) {
 
-    wc_add_notice(
-        __('Delivery is not available for this postcode.', 'wc-dpv'),
-        'error'
-    );
+        wc_add_notice(
+            __('Delivery is not available for this postcode.', 'wc-dpv'),
+            'error'
+        );
     }
 }
-
 
 }

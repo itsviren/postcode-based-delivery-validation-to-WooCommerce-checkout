@@ -58,7 +58,7 @@ jQuery(function ($) {
                     validatePostcode(postcode);
                 }
 
-            }, 500);
+            }, 100);
 
         }
     );
