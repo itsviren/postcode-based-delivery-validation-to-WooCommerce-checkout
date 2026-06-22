@@ -10,7 +10,7 @@ class WC_DPV_Order
     {
         add_action(
             'woocommerce_checkout_create_order',
-            [$this, 'save_order_meta'],
+            [$this, 'save_postcode_to_order'],
             10,
             2
         );
@@ -26,16 +26,12 @@ class WC_DPV_Order
         );
     }
 
-public function save_order_meta($order, $data)
+public function save_postcode_to_order($order, $data)
 {
-    if (
-        isset($_POST['billing_delivery_postcode'])
-    ) {
+    if (!empty($data['billing_delivery_postcode'])) {
 
         $postcode = sanitize_text_field(
-            wp_unslash(
-                $_POST['billing_delivery_postcode']
-            )
+            $data['billing_delivery_postcode']
         );
 
         $order->update_meta_data(
@@ -49,7 +45,24 @@ public function save_order_meta($order, $data)
     {
     }
 
-    public function display_admin_postcode($order)
-    {
+public function display_admin_postcode($order)
+{
+    $postcode = $order->get_meta(
+        '_delivery_postcode'
+    );
+
+    if (!$postcode) {
+        return;
     }
+
+    echo '<p>';
+    echo '<strong>' .
+        esc_html__(
+            'Delivery Postcode:',
+            'wc-dpv'
+        ) .
+        '</strong> ';
+    echo esc_html($postcode);
+    echo '</p>';
+}
 }
