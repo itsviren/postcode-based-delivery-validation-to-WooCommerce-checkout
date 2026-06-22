@@ -17,7 +17,7 @@ class WC_DPV_Order
 
         add_action(
             'woocommerce_thankyou',
-            [$this, 'display_thankyou_postcode']
+            [$this, 'display_postcode_on_thankyou']
         );
 
         add_action(
@@ -41,9 +41,35 @@ public function save_postcode_to_order($order, $data)
     }
 }
 
-    public function display_thankyou_postcode($order_id)
-    {
+public function display_postcode_on_thankyou($order_id)
+{
+    $order = wc_get_order($order_id);
+
+    if (!$order) {
+        return;
     }
+
+    $postcode = $order->get_meta(
+        '_delivery_postcode'
+    );
+
+    if (empty($postcode)) {
+        return;
+    }
+
+    echo '<p>';
+
+    echo '<strong>' .
+        esc_html__(
+            'Delivery Postcode:',
+            'wc-dpv'
+        ) .
+        '</strong> ';
+
+    echo esc_html($postcode);
+
+    echo '</p>';
+}
 
 public function display_admin_postcode($order)
 {
